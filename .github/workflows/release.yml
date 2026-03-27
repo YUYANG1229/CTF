@@ -1,7 +1,5 @@
 name: Build & Release
 
-# 触发条件：推送 v* 标签（如 git tag v1.0.0 && git push --tags）
-# 或手动触发
 on:
   push:
     tags:
@@ -14,15 +12,18 @@ on:
         default: 'dev'
 
 permissions:
-  contents: write   # 允许创建 Release
+  contents: write
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
 
   # ════════════════════════════════════════════
-  #  macOS arm64 (Apple Silicon)
+  #  macOS arm64 (Apple Silicon M1/M2/M3)
   # ════════════════════════════════════════════
   build-macos-arm64:
-    runs-on: macos-14          # Apple Silicon runner (M1)
+    runs-on: macos-14
     steps:
       - uses: actions/checkout@v4
 
@@ -50,39 +51,6 @@ jobs:
         with:
           name: ctf-toolkit-macos-arm64
           path: dist/ctf-toolkit-macos-arm64
-
-  # ════════════════════════════════════════════
-  #  macOS x86_64 (Intel)
-  # ════════════════════════════════════════════
-  build-macos-x64:
-    runs-on: macos-13          # Intel runner
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install pyinstaller pyinstaller-hooks-contrib
-
-      - name: Build binary
-        run: |
-          pyinstaller ctf_toolkit.spec --clean --noconfirm
-          ls -lh dist/
-
-      - name: Rename binary
-        run: mv dist/ctf-toolkit dist/ctf-toolkit-macos-x64
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: ctf-toolkit-macos-x64
-          path: dist/ctf-toolkit-macos-x64
 
   # ════════════════════════════════════════════
   #  Windows x64
@@ -154,7 +122,7 @@ jobs:
   #  创建 GitHub Release
   # ════════════════════════════════════════════
   release:
-    needs: [build-macos-arm64, build-macos-x64, build-windows, build-linux]
+    needs: [build-macos-arm64, build-windows, build-linux]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -191,7 +159,6 @@ jobs:
             | 平台 | 文件 | 说明 |
             |------|------|------|
             | macOS Apple Silicon (M1/M2/M3) | `ctf-toolkit-macos-arm64` | arm64 |
-            | macOS Intel | `ctf-toolkit-macos-x64` | x86_64 |
             | Windows 10/11 | `ctf-toolkit-windows-x64.exe` | x64 |
             | Linux | `ctf-toolkit-linux-x64` | x86_64 |
 
@@ -203,7 +170,6 @@ jobs:
             ./ctf-toolkit-macos-arm64 --help
             ./ctf-toolkit-macos-arm64 scan http://target.com
             ./ctf-toolkit-macos-arm64 sqli http://target.com --param id
-            ./ctf-toolkit-macos-arm64 xxe http://target.com --action detect
             ```
 
             **Windows：**
@@ -219,6 +185,5 @@ jobs:
 
           files: |
             release-assets/ctf-toolkit-macos-arm64/ctf-toolkit-macos-arm64
-            release-assets/ctf-toolkit-macos-x64/ctf-toolkit-macos-x64
             release-assets/ctf-toolkit-windows-x64/ctf-toolkit-windows-x64.exe
             release-assets/ctf-toolkit-linux-x64/ctf-toolkit-linux-x64
