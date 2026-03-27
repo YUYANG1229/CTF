@@ -6,3 +6,4 @@ __pycache__/
 *.spec.bak
 *.egg-info/
 .claude/
+.github/
